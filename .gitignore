@@ -1,0 +1,24 @@
+# 忽略文件
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# 临时文件
+*.tmp
+*.temp
+*.log
+
+# 敏感信息（如果后期有配置文件）
+.env
+.env.local
+*.key
+*.pem
+
+# 操作系统
+*.bak
+*~
