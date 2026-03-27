@@ -132,7 +132,7 @@
 | 团队同步协议 | ✅ `/Users/mf/.openclaw/workspace/.ai-team/TEAM_SYNC_PROTOCOL.md` |
 | Codex 角色 | 总控 |
 | OpenClaw 角色 | 业务执行中枢 |
-| Claude Code 角色 | 得力助手 |
+| Claude Code 角色 | **导师**（能力培养、流程设计、输出审阅、示范执行） |
 
 ## OpenClaw 训练体系记忆
 
