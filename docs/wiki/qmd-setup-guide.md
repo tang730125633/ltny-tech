@@ -362,7 +362,107 @@ openclaw
 
 ---
 
-## 八、模型文件说明
+## 八、高性能配置（M4 Pro / 64GB 专用）
+
+> 适用于戴总的 Mac mini：M4 Pro + 64GB RAM + 2TB SSD
+
+默认配置使用最轻量的模型和最快的搜索模式，适合普通机器。
+戴总的机器性能强劲，可以解锁全部能力。
+
+### 升级嵌入模型
+
+默认的 embeddinggemma-300M 只有 3 亿参数。可以升级到 Qwen3-Embedding-0.6B（6 亿参数），检索质量显著提升：
+
+```bash
+# 在 openclaw.json 的 agents.defaults 中添加嵌入模型配置
+# 或通过 CLI 配置：
+openclaw configure --section agents.defaults.embeddingModel \
+  'hf:Qwen/Qwen3-Embedding-0.6B-GGUF/Qwen3-Embedding-0.6B-Q8_0.gguf?provider=local&hybrid=true&cpu_threads=8'
+```
+
+### 升级搜索模式
+
+将 `searchMode` 从 `"search"` 改为 `"query"`，启用完整的混合搜索 + LLM 重排：
+
+### 完整高性能 memory 配置
+
+```json
+{
+  "memory": {
+    "backend": "qmd",
+    "citations": "auto",
+    "qmd": {
+      "searchMode": "query",
+      "includeDefaultMemory": true,
+      "paths": [
+        {
+          "name": "knowledge-base",
+          "path": "/Users/mf/.openclaw/workspace/archive/08_文档资料/知识库",
+          "pattern": "**/*.md"
+        }
+      ],
+      "update": {
+        "onBoot": true,
+        "interval": "5m"
+      }
+    },
+    "memorySearch": {
+      "query": {
+        "hybrid": {
+          "enabled": true,
+          "vectorWeight": 0.6,
+          "textWeight": 0.4,
+          "candidateMultiplier": 3
+        }
+      }
+    },
+    "mmr": {
+      "enabled": true,
+      "lambda": 0.7
+    },
+    "temporalDecay": {
+      "enabled": true,
+      "halfLifeDays": 30
+    },
+    "limits": {
+      "maxResults": 10,
+      "maxSnippetChars": 2000,
+      "maxInjectedChars": 8000
+    }
+  }
+}
+```
+
+### 高性能 vs 标准配置对比
+
+| 配置项 | 标准配置（普通机器） | 高性能配置（M4 Pro 64GB） |
+|:---|:---|:---|
+| searchMode | `search`（BM25） | `query`（混合 + LLM 重排） |
+| 嵌入模型 | embeddinggemma-300M | Qwen3-Embedding-0.6B |
+| 混合搜索 | ❌ 关闭 | ✅ 开启（向量 0.6 + 文本 0.4） |
+| MMR 多样性重排 | ❌ 关闭 | ✅ 开启（lambda=0.7） |
+| 时间衰减 | ❌ 关闭 | ✅ 开启（半衰期 30 天） |
+| 索引更新间隔 | 10 分钟 | 5 分钟 |
+| 返回结果数 | 默认 | 最多 10 条 |
+| 注入上下文量 | 默认 | 最多 8000 字符 |
+| 额外索引路径 | 无 | 知识库目录 |
+| 预估额外内存占用 | ~500MB | ~2GB |
+| 单次搜索延迟 | <100ms | 1-3 秒（可接受） |
+
+### 预热所有模型（首次安装后执行）
+
+```bash
+# 下载并预热全部 3 个模型，避免首次对话时等待
+qmd update
+qmd embed -f
+qmd vsearch "电力行业政策"   # 触发查询扩展模型下载
+qmd query "碳核算方法"       # 触发重排模型下载
+echo "✅ 所有模型已就绪"
+```
+
+---
+
+## 九、模型文件说明（全部模型）
 
 QMD 使用 3 个本地 GGUF 模型，存储在 `~/.cache/qmd/models/`：
 
