@@ -45,6 +45,23 @@ ltny-tech/
 └── reports/             # 行业报告与分析
 ```
 
+## Claude 远程指导 OpenClaw（Git 协作模式）
+
+已内置双向沟通通道：
+
+- 导师下发：`communication/claude-to-xiaol.md`
+- OpenClaw 汇报：`communication/xiaol-to-claude.md`
+- 协作变更：`communication/changelog.md`
+- 远程执行说明：`communication/REMOTE_GUIDANCE_SOP.md`
+- 早报模板：`briefings/templates/daily-briefing.md`
+
+建议执行节奏：
+
+1. Claude 更新指导指令并 `git push`
+2. OpenClaw `git pull` 后按指令执行并产出到 `briefings/output/`
+3. OpenClaw 写回 `xiaol-to-claude.md` 并 `git push`
+4. Claude 审阅后将修订版放入 `briefings/reviewed/` 并继续下发下一轮任务
+
 ---
 
 ## 服务优势
